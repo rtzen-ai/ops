@@ -1,0 +1,4 @@
+steps:
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args: ['gcloud', 'logging', 'sinks', 'update', '_Default', '--update-exclusion', 'name=logs,disabled=false']
+  id: 'Stopping Logs Ingestion for Development'
