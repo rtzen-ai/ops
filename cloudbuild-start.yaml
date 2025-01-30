@@ -2,3 +2,43 @@ steps:
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   args: ['gcloud', 'logging', 'sinks', 'update', '_Default', '--update-exclusion', 'name=logs,disabled=true']
   id: 'Starting Logs Flow for Development'
+
+- name: curlimages/curl
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      curl -X POST -H 'Content-type: application/json' \
+      --data '{
+        "text": "✅ Log Ingestion Start Build Succeeded!",
+        "blocks": [
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "✅ *Log Ingestion Start Build Succeeded*"
+            }
+          },
+          {
+            "type": "section",
+            "fields": [
+              {
+                "type": "mrkdwn",
+                "text": "*Project:*\n$PROJECT_ID"
+              },
+              {
+                "type": "mrkdwn",
+                "text": "*Build ID:*\n$BUILD_ID"
+              }
+            ]
+          }
+        ]
+      }' $$SLACK_WEBHOOK_URL
+  secretEnv: ['SLACK_WEBHOOK_URL']
+  waitFor: ['Starting Logs Flow for Development']
+  id: 'Slack Notification'
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/$PROJECT_ID/secrets/slack-webhook-url/versions/latest
+    env: 'SLACK_WEBHOOK_URL'
